@@ -8,7 +8,7 @@ const db = mysql.createConnection({
     host: 'localhost',  // hôte, en général 'localhost' pour phpMyAdmin local
     user: 'root',       // ton nom d'utilisateur MySQL
     password: 'teo',       // ton mot de passe MySQL
-    database: 'restaurantapi',  // Remplace par le nom de ta base de données
+    database: 'sneakersapi',  // Remplace par le nom de ta base de données
 });
  
 db.connect((err) => {

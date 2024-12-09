@@ -1,23 +1,23 @@
 services:
   phpmyadmin:
-    container_name: restaurant-phpmyadmin
+    container_name: sneakers-phpmyadmin
     image: phpmyadmin
     environment:
-      - PMA_HOST=restaurant-database
+      - PMA_HOST=sneakers-database
     ports:
       - "6060:80"
     networks:
-      - restaurant-network
+      - sneakers-network
  
   database:
-    container_name: restaurant-database
+    container_name: sneakers-database
     image: mariadb
     environment:
       - MARIADB_ROOT_PASSWORD=teo
-    ports:
+    ports: 
       - "3306:3306"
     networks:
-      - restaurant-network
+      - sneakers-network
  
 networks:
-  restaurant-network:
+  sneakers-network:
