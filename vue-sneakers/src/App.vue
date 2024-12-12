@@ -1,7 +1,6 @@
 <template>
   <nav>
     <NavBar /><router-view />
-    <router-link to="/">Home</router-link> 
   </nav>
 </template>
 <script>
