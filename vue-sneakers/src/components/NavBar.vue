@@ -1,161 +1,111 @@
 <template>
   <nav class="navbar">
-    <div class="navbar-header">
-      <div class="logo">
-        <img src="../assets/logo.png" alt="MyShop Logo" class="logo-icon" aria-label="MyShop Logo" />
-        <router-link to="/" class="logo-text" aria-label="Go to Home Page">Dynamico</router-link>
-      </div>
-      <button class="burger-menu" @click="toggleMenu" aria-label="Toggle Navigation Menu">
-        <img src="../assets/menu-icon.svg" alt="Menu" />
+    <div class="navbar-left">
+      <button class="menu-button">
+        <span></span>
+        <span></span>
       </button>
     </div>
-    <div class="nav-links" :class="{ 'nav-links-visible': isMenuOpen }">
-      <router-link to="/" aria-label="Go to Products Page">Products</router-link>
-      <router-link v-if="isAuthenticated" to="/purchase-history" aria-label="Go to Purchase History">Purchase History</router-link>
-      <router-link v-if="isAuthenticated" to="/cart" aria-label="Go to My Cart">My Cart</router-link>
-      <router-link v-if="!isAuthenticated" to="/register" aria-label="Go to Register Page">Register</router-link>
-      <router-link v-if="!isAuthenticated" to="/login" aria-label="Go to Login Page">Login</router-link>
-      <router-link v-if="isAuthenticated" to="/admin/products" aria-label="Go to Admin Dashboard">Dashboard</router-link>
-      <button v-if="isAuthenticated" @click="handleLogout" aria-label="Logout">Logout</button>
+    <div class="navbar-center">
+      <img src="@/assets/logo.png" alt="Logo" class="logo" />
+    </div>
+    <div class="navbar-right">
+      <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Recherche" />
+        <i class="icon search-icon">
+          <img src="@/assets/search-icon.svg" alt="Search" />
+        </i>
+      </div>
+      <i class="icon heart-icon">
+        <img src="@/assets/heart-icon.svg" alt="Heart" />
+      </i>
+      <i class="icon help-icon">
+        <img src="@/assets/help-icon.svg" alt="Help" />
+      </i>
+      <i class="icon user-icon">
+        <img src="@/assets/user-icon.svg" alt="User" />
+      </i>
     </div>
   </nav>
 </template>
 
-<script>
-import { mapState, mapActions } from "vuex";
-
-export default {
-  name: "NavBar",
-  data() {
-    return {
-      isMenuOpen: false,
-    };
-  },
-  computed: {
-    ...mapState(["user", "token"]),
-    isAuthenticated() {
-      return !!this.token;
-    },
-    isAdmin() {
-      return this.user && this.user.roles.includes("ROLE_ADMIN");
-    },
-  },
-  methods: {
-    ...mapActions(["logout"]),
-    handleLogout() {
-      this.logout();
-      this.$router.push("/login");
-    },
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
-    },
-  },
-};
-</script>
-
 <style scoped>
 .navbar {
   display: flex;
-  flex-direction: column;
-  background-color: white;
-  padding: 10px 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.navbar-header {
-  display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 16px;
+  height: 60px;
+  width: 100%;
+  border-bottom: 1px solid #eaeaea;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo-icon {
-  width: 50px;
-  height: 50px;
-}
-
-.logo-text {
-  margin-left: 10px;
-  font-size: 20px;
-  text-decoration: none;
-  color: black;
-}
-
-.burger-menu {
+.navbar-left .menu-button {
   background: none;
   border: none;
   cursor: pointer;
-}
-
-.burger-menu img {
-  width: 25px;
-  height: 25px;
-}
-
-.nav-links {
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.nav-links.nav-links-visible {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.nav-links a,
-.nav-links button {
-  color: black;
-  text-decoration: none;
-  background: none;
+.navbar-left .menu-button span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: black;
+}
+
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.navbar-center .logo {
+  height: 40px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-bar {
   border: none;
-  padding: 10px;
-  text-align: left;
-  font-size: 16px;
+  border-bottom: 1px solid #ccc;
+  outline: none;
+  padding: 4px 8px;
+  font-size: 14px;
+  padding-right: 30px; /* Crée de l'espace pour l'icône */
 }
 
-.nav-links a:hover,
-.nav-links button:hover {
-  background-color: #f0f0f0;
+.search-icon {
+  position: absolute;
+  right: 8px; /* Positionne l'icône à la droite de la barre de recherche */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  cursor: pointer;
 }
 
-@media (min-width: 768px) {
-  .navbar {
-    flex-direction: row;
-    align-items: center;
-    padding: 10px 50px;
-  }
+.navbar-right .icon {
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+}
 
-  .navbar-header {
-    flex-grow: 1;
-  }
-
-  .burger-menu {
-    display: none;
-  }
-
-  .nav-links {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    gap: 20px;
-    margin-top: 0;
-  }
-
-  .nav-links a,
-  .nav-links button {
-    padding: 10px 20px;
-    font-size: 18px;
-  }
-
-  .nav-links a:hover,
-  .nav-links button:hover {
-    background: none;
-    text-decoration: underline;
-  }
+.navbar-right .icon img {
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -1,20 +1,17 @@
 <template>
-  <div id="app">
-    <NavBar />
-    <router-view />
-  </div>
+  <nav>
+    <NavBar /><router-view />
+    <router-link to="/">Home</router-link> 
+  </nav>
 </template>
-
 <script>
-import NavBar from './components/NavBar.vue';
-
+import NavBar from './components/NavBar.vue'
 export default {
   components: {
-    NavBar,
-  },
-};
+    NavBar
+  }
+}
 </script>
-
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -22,5 +19,16 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  width: 98%;
+}
+
+
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+nav a.router-link-exact-active {
+  color: #42b983;
 }
 </style>

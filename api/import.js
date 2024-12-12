@@ -5,7 +5,7 @@ const mysql = require('mysql2/promise');
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    port: 6060,
+    port: 3306,
     password: 'teo',
     database: 'sneakersapi',
 };
