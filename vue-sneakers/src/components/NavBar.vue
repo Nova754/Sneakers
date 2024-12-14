@@ -36,8 +36,9 @@
   align-items: center;
   padding: 0 16px;
   height: 60px;
-  width: 100%;
-  border-bottom: 1px solid #eaeaea;
+  width: 98%;
+  border-bottom: 1px solid #D7CBC2;
+  background-color: white;
 }
 
 .navbar-left .menu-button {
@@ -75,10 +76,14 @@
 .search-container {
   position: relative;
 }
-
+input {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
 .search-bar {
   border: none;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #D7CBC2;
   outline: none;
   padding: 4px 8px;
   font-size: 14px;

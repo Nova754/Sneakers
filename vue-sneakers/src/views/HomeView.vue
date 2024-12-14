@@ -1,7 +1,7 @@
 <template>
   <div class="sneakers-container">
     <div class="breadcrumb">
-      <a href="#">Accueil</a> / <a href="#">Sneakers</a> / <span>(Très) Rares</span>
+      <a href="#">Accueil</a> / <span href="#">Sneakers (Très) Rares</span>
     </div>
     <div class="filters">
       <button class="filter-button">Trier</button>
@@ -18,7 +18,6 @@
         <h3>{{ sneaker.brand }}</h3>
         <p>{{ sneaker.name }}</p>
         <p class="price">{{ sneaker.price }}€</p>
-        <p class="release-date">Sortie le : {{ formatDate(sneaker.releaseDate) }}</p>
         <button v-if="sneaker.stock > 0" class="discover-button">Découvrir</button>
         <span v-else class="out-of-stock">Rupture de stock</span>
       </div>
@@ -92,23 +91,24 @@ export default {
 <style scoped>
 .sneakers-container {
   width: 100%;
-  margin: 0 auto;
-  text-align: left;
+  margin: 10px auto;
 }
 
 .breadcrumb {
-  margin-bottom: 20px;
   font-size: 14px;
-  color: #555;
+  color: #A79284;
+  text-align: left;
 }
 
 .breadcrumb a {
   text-decoration: none;
-  color: #000;
+  color: #A79284;
+  margin: 10px;
 }
 
 .breadcrumb span {
-  color: #999;
+  color: #A79284;
+  margin: 10px;
 }
 
 .filters {
@@ -116,17 +116,19 @@ export default {
   justify-content: flex-end;
   gap: 10px;
   margin-bottom: 20px;
+  margin-right: 10px;
 }
 
 .filter-button {
-  border: 1px solid #000;
-  background: transparent;
+  border: 1px solid #baa393;
+  background: white;
   padding: 8px 12px;
   cursor: pointer;
+  color: #baa393;
 }
 
 .filter-dark {
-  background: #2a002b;
+  background: #baa393;
   color: white;
 }
 
@@ -134,7 +136,7 @@ export default {
   text-align: center;
   font-size: 18px;
   font-weight: bold;
-  color: #555;
+  color: #baa393;
   margin: 40px 0;
 }
 
@@ -142,18 +144,23 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
+  width: 97%;
+  margin: 0 auto;
 }
 
 .sneaker-card {
   text-align: center;
-  border: 1px solid #eaeaea;
+  border: 1px solid #D7CBC2;
   padding: 20px;
   border-radius: 8px;
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  position: relative;
+  background-color: white;
 }
 
 .sneaker-card:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
 }
 
 .sneaker-image {
@@ -169,18 +176,20 @@ export default {
 }
 
 .discover-button {
-  background: #2a002b;
+  background: #baa393;
   color: #fff;
-  padding: 8px 16px;
+  padding: 12px 20px; /* Augmenter les valeurs pour un rectangle plus marqué */
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0; /* Supprimer les coins arrondis */
+  opacity: 0; /* Caché par défaut */
+  transition: opacity 0.3s ease;
+  width: 100%; /* Faire correspondre la largeur au parent si nécessaire */
+  text-align: center; /* Centrer le texte */
 }
 
-.out-of-stock {
-  color: red;
-  font-size: 14px;
-  font-weight: bold;
+.sneaker-card:hover .discover-button {
+  opacity: 1; /* Rendre visible au survol */
 }
 
 .pagination {
@@ -189,12 +198,15 @@ export default {
   align-items: center;
   gap: 10px;
   margin: 20px 0;
+  padding-bottom: 20px;
+  color: #baa393;
 }
 
 .pagination button {
   padding: 8px 16px;
-  border: 1px solid #000;
-  background-color: transparent;
+  border: 1px solid #baa393;
+  color : #baa393;
+  background-color: white;
   cursor: pointer;
 }
 
