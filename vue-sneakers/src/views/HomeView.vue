@@ -7,25 +7,23 @@
       <button class="filter-button">Trier</button>
       <button class="filter-button filter-dark">Filtrer</button>
     </div>
-    <div class="sneakers-grid">
-      <div
-        v-for="sneaker in sneakers"
-        :key="sneaker.id"
-        class="sneaker-card"
-      >
+    <!-- Message de chargement -->
+    <div v-if="isLoading" class="loading-message">
+      Chargement des sneakers en cours...
+    </div>
+    <!-- Grille des sneakers -->
+    <div v-else class="sneakers-grid">
+      <div v-for="sneaker in sneakers" :key="sneaker.id" class="sneaker-card">
         <img :src="sneaker.image" :alt="sneaker.name" class="sneaker-image" />
         <h3>{{ sneaker.brand }}</h3>
         <p>{{ sneaker.name }}</p>
-        <p class="price">{{ item.price }}€</p>
-        <button
-          v-if="item.stock > 0"
-          class="discover-button"
-        >
-          Découvrir
-        </button>
+        <p class="price">{{ sneaker.price }}€</p>
+        <p class="release-date">Sortie le : {{ formatDate(sneaker.releaseDate) }}</p>
+        <button v-if="sneaker.stock > 0" class="discover-button">Découvrir</button>
         <span v-else class="out-of-stock">Rupture de stock</span>
       </div>
     </div>
+    <!-- Pagination -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Précédent</button>
       <span>Page {{ currentPage }} / {{ totalPages }}</span>
@@ -35,43 +33,58 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  name: 'HomeView',
   data() {
     return {
-      sneakers: [], // Données des sneakers récupérées depuis l'API
+      sneakers: [], // Sneakers de la page actuelle
       currentPage: 1, // Page actuelle
-      totalPages: 1, // Nombre total de pages
+      totalPages: 0, // Nombre total de pages
+      isLoading: false, // Indicateur de chargement
     };
   },
   methods: {
-      fetchSneakers() {
-        const offset = (this.currentPage - 1) * 10; // Assuming 10 sneakers per page
-        fetch(`http://localhost:3000/sneakersapi/item?offset=${offset}&limit=10`, { headers })
-          .then((response) => response.json())
-          .then((data) => {
-            this.sneakers = data.items;
-            this.totalPages = Math.ceil(data.totalItems / 10);
-          })
-          .catch((err) => {
-            console.error("Error loading products:", err);
-          });
-      },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-        this.fetchSneakers();
+    async fetchItems() {
+      this.isLoading = true;
+      try {
+        const response = await axios.get(`http://localhost:3000/item?page=${this.currentPage}`);
+        this.sneakers = response.data.data.map(sneaker => ({
+          ...sneaker,
+          price: sneaker.estimatedMarketValue, // Utiliser estimatedMarketValue comme prix
+          stock: 10, // Vous pouvez ajuster la logique pour gérer le stock réel
+          releaseDate: sneaker.releaseDate, // Stocker la date de sortie
+        }));
+        this.totalPages = response.data.total_pages;
+      } catch (error) {
+        console.error("Erreur lors du chargement des items :", error);
+      } finally {
+        this.isLoading = false;
       }
     },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
-        this.fetchSneakers();
+        this.fetchItems();
       }
     },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+        this.fetchItems();
+      }
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    },
   },
-  mounted() {
-    this.fetchSneakers(); // Appel initial pour récupérer les sneakers
+  created() {
+    this.fetchItems();
   },
 };
 </script>
@@ -117,9 +130,17 @@ export default {
   color: white;
 }
 
+.loading-message {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #555;
+  margin: 40px 0;
+}
+
 .sneakers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
 }
 
