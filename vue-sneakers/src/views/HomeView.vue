@@ -18,7 +18,7 @@
         <h3>{{ sneaker.brand }}</h3>
         <p>{{ sneaker.name }}</p>
         <p class="price">{{ sneaker.price }}€</p>
-        <button v-if="sneaker.stock > 0" class="discover-button">Découvrir</button>
+        <button v-if="sneaker.stock > 0" class="discover-button" @click="openModal(sneaker)">Découvrir</button>
         <span v-else class="out-of-stock">Rupture de stock</span>
       </div>
     </div>
@@ -41,6 +41,8 @@ export default {
       currentPage: 1, // Page actuelle
       totalPages: 0, // Nombre total de pages
       isLoading: false, // Indicateur de chargement
+      showModal: false, // Indicateur de modal
+      selectedSneaker: {}, // Sneaker sélectionné pour le modal
     };
   },
   methods: {
@@ -81,6 +83,13 @@ export default {
         day: 'numeric'
       });
     },
+    openModal(sneaker) {
+      this.selectedSneaker = sneaker;
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
   },
   created() {
     this.fetchItems();
@@ -96,18 +105,19 @@ export default {
 
 .breadcrumb {
   font-size: 14px;
-  color: #A79284;
+  color: white;
   text-align: left;
 }
 
 .breadcrumb a {
+  font-weight: bold;
   text-decoration: none;
-  color: #A79284;
+  color: white;
   margin: 10px;
 }
 
 .breadcrumb span {
-  color: #A79284;
+  color: white;
   margin: 10px;
 }
 
@@ -199,7 +209,8 @@ export default {
   gap: 10px;
   margin: 20px 0;
   padding-bottom: 20px;
-  color: #baa393;
+  color: white;
+  font-weight:500;
 }
 
 .pagination button {
@@ -213,5 +224,39 @@ export default {
 .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 10px;
 }
 </style>

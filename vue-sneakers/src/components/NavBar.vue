@@ -2,9 +2,10 @@
   <nav class="navbar">
     <div class="navbar-left">
       <button class="menu-button">
-        <span></span>
-        <span></span>
-      </button>
+        <i class="icon menu-icon">
+          <img src="@/assets/menu-icon.png" alt="Menu" />
+        </i>
+        </button>
     </div>
     <div class="navbar-center">
       <img src="@/assets/logo.png" alt="Logo" class="logo" />
@@ -36,8 +37,8 @@
   align-items: center;
   padding: 0 16px;
   height: 60px;
-  width: 98%;
-  border-bottom: 1px solid #D7CBC2;
+  
+  border-bottom: 1px solid #3f1107;
   background-color: white;
 }
 
@@ -83,7 +84,7 @@ input {
 }
 .search-bar {
   border: none;
-  border-bottom: 1px solid #D7CBC2;
+  border-bottom: 1px solid #3f1107;
   outline: none;
   padding: 4px 8px;
   font-size: 14px;
@@ -98,7 +99,10 @@ input {
   font-size: 18px;
   cursor: pointer;
 }
-
+.menu-button .icon img {
+  width: 24px;
+  height: 24px;
+}
 .navbar-right .icon {
   font-size: 18px;
   cursor: pointer;
@@ -106,7 +110,7 @@ input {
   justify-content: center;
   align-items: center;
   width: 24px;
-  height: 24px;
+  height: auto;
 }
 
 .navbar-right .icon img {

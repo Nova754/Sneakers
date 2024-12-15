@@ -18,17 +18,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  width: 100%;
-  background-color: #EFEAE5;
+  
+  background: url(./assets/background.png) no-repeat center center fixed;
+  background-size: cover; /* Ajuste l'image pour couvrir toute la surface */
 }
 
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+nav {
+  position: relative; /* Assure que le contenu reste au-dessus du fond */
+  z-index: 1; /* Place le contenu devant l'image */
 }
 </style>
