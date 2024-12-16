@@ -1,8 +1,5 @@
 <template>
   <div class="sneakers-container">
-    <div class="breadcrumb">
-      <a href="#">Accueil</a> / <span href="#">Sneakers (Très) Rares</span>
-    </div>
     <div class="filters">
       <!-- Bouton Trier avec menu burger -->
       <div class="filter-menu-container">
@@ -14,31 +11,48 @@
           <label for="brand">Brand:</label>
           <input type="text" v-model="fetchItems.brand" placeholder="Brand..." @input="fetchItems" />
         </div>
-         
-        
       </div>
       <button class="filter-button filter-dark">Aucun filtre</button>
     </div>
-    <!-- Message de chargement -->
-    <div v-if="isLoading" class="loading-message">
-      Chargement des sneakers en cours...
-    </div>
+
     <!-- Grille des sneakers -->
-    <div v-else class="sneakers-grid">
+    <div class="sneakers-grid">
       <div v-for="sneaker in sneakers" :key="sneaker.id" class="sneaker-card">
         <img :src="sneaker.image" :alt="sneaker.name" class="sneaker-image" />
         <h3>{{ sneaker.brand }}</h3>
         <p>{{ sneaker.name }}</p>
         <p class="price">{{ sneaker.price }}€</p>
-        <button v-if="sneaker.stock > 0" class="discover-button" @click="openModal(sneaker)">Découvrir</button>
+        <button v-if="sneaker.stock > 0" class="discover-button" @click="openModal(sneaker)">
+          Découvrir
+        </button>
         <span v-else class="out-of-stock">Rupture de stock</span>
+
+        <!-- Boutons Wishlist -->
+        <button
+          v-if="!isInWishlist(sneaker.id)"
+          class="wishlist-button"
+          @click="addToWishlist(sneaker)"
+        >
+          Ajouter à la Wishlist
+        </button>
+        <button
+          v-else
+          class="wishlist-button remove"
+          @click="removeFromWishlist(sneaker.id)"
+        >
+          Retirer de la Wishlist
+        </button>
       </div>
     </div>
+
+    <!-- Pagination -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Précédent</button>
-      <span>Page 
+      <span>
+        Page
         <input type="number" v-model.number="currentPage" @change="fetchItems" min="1" :max="totalPages" />
-        / {{ totalPages }}</span>
+        / {{ totalPages }}
+      </span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Suivant</button>
     </div>
   </div>
@@ -54,7 +68,7 @@ export default {
       currentPage: 1,
       totalPages: 0,
       isLoading: false,
-      isFilterMenuOpen: false, // État du menu Trier
+      isFilterMenuOpen: false,
     };
   },
   methods: {
@@ -78,6 +92,22 @@ export default {
         this.isLoading = false;
       }
     },
+    addToWishlist(sneaker) {
+      let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      if (!wishlist.some(item => item.id === sneaker.id)) {
+        wishlist.push(sneaker);
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      }
+    },
+    removeFromWishlist(sneakerId) {
+      let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      wishlist = wishlist.filter(item => item.id !== sneakerId);
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    },
+    isInWishlist(sneakerId) {
+      let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      return wishlist.some(item => item.id === sneakerId);
+    },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
@@ -94,8 +124,8 @@ export default {
       this.isFilterMenuOpen = !this.isFilterMenuOpen;
     },
     sortBy(criteria) {
-      this.fetchItems(criteria); // Applique le tri
-      this.isFilterMenuOpen = false; // Ferme le menu
+      this.fetchItems(criteria);
+      this.isFilterMenuOpen = false;
     },
   },
   created() {
@@ -108,24 +138,6 @@ export default {
 .sneakers-container {
   width: 100%;
   margin: 10px auto;
-}
-
-.breadcrumb {
-  font-size: 14px;
-  color: white;
-  text-align: left;
-}
-
-.breadcrumb a {
-  font-weight: bold;
-  text-decoration: none;
-  color: white;
-  margin: 10px;
-}
-
-.breadcrumb span {
-  color: white;
-  margin: 10px;
 }
 
 .filters {

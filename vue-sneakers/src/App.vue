@@ -18,7 +18,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  
   background: url(./assets/background.png) no-repeat center center fixed;
   background-size: cover; /* Ajuste l'image pour couvrir toute la surface */
 }
