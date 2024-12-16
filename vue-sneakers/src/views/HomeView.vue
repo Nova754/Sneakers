@@ -4,8 +4,20 @@
       <a href="#">Accueil</a> / <span href="#">Sneakers (Très) Rares</span>
     </div>
     <div class="filters">
-      <button class="filter-button">Trier</button>
-      <button class="filter-button filter-dark">Filtrer</button>
+      <!-- Bouton Trier avec menu burger -->
+      <div class="filter-menu-container">
+        <button class="filter-button" @click="toggleFilterMenu">
+          Filtrer
+          <span class="burger-icon">☰</span>
+        </button>
+        <div v-if="isFilterMenuOpen" class="filter-dropdown">
+          <label for="brand">Brand:</label>
+          <input type="text" v-model="fetchItems.brand" placeholder="Brand..." @input="fetchItems" />
+        </div>
+         
+        
+      </div>
+      <button class="filter-button filter-dark">Aucun filtre</button>
     </div>
     <!-- Message de chargement -->
     <div v-if="isLoading" class="loading-message">
@@ -22,41 +34,44 @@
         <span v-else class="out-of-stock">Rupture de stock</span>
       </div>
     </div>
-    <!-- Pagination -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Précédent</button>
-      <span>Page {{ currentPage }} / {{ totalPages }}</span>
+      <span>Page 
+        <input type="number" v-model.number="currentPage" @change="fetchItems" min="1" :max="totalPages" />
+        / {{ totalPages }}</span>
       <button @click="nextPage" :disabled="currentPage === totalPages">Suivant</button>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   data() {
     return {
-      sneakers: [], // Sneakers de la page actuelle
-      currentPage: 1, // Page actuelle
-      totalPages: 0, // Nombre total de pages
-      isLoading: false, // Indicateur de chargement
-      showModal: false, // Indicateur de modal
-      selectedSneaker: {}, // Sneaker sélectionné pour le modal
+      sneakers: [],
+      currentPage: 1,
+      totalPages: 0,
+      isLoading: false,
+      isFilterMenuOpen: false, // État du menu Trier
     };
   },
   methods: {
-    async fetchItems() {
+    async fetchItems(sortBy = null) {
       this.isLoading = true;
       try {
-        const response = await axios.get(`http://localhost:3000/item?page=${this.currentPage}`);
-        this.sneakers = response.data.data.map(sneaker => ({
+        const params = { page: this.currentPage };
+        if (sortBy) params.sortBy = sortBy;
+
+        const response = await axios.get("http://localhost:3000/item", { params });
+        this.sneakers = response.data.data.map((sneaker) => ({
           ...sneaker,
-          price: sneaker.estimatedMarketValue, // Utiliser estimatedMarketValue comme prix
-          stock: 10, // Vous pouvez ajuster la logique pour gérer le stock réel
-          releaseDate: sneaker.releaseDate, // Stocker la date de sortie
+          price: sneaker.estimatedMarketValue,
+          stock: 10,
+          releaseDate: sneaker.releaseDate,
         }));
-        this.totalPages = response.data.total_pages;
+        this.totalPages = response.data.meta.totalPages;
       } catch (error) {
         console.error("Erreur lors du chargement des items :", error);
       } finally {
@@ -75,20 +90,12 @@ export default {
         this.fetchItems();
       }
     },
-    formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('fr-FR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+    toggleFilterMenu() {
+      this.isFilterMenuOpen = !this.isFilterMenuOpen;
     },
-    openModal(sneaker) {
-      this.selectedSneaker = sneaker;
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
+    sortBy(criteria) {
+      this.fetchItems(criteria); // Applique le tri
+      this.isFilterMenuOpen = false; // Ferme le menu
     },
   },
   created() {
@@ -258,5 +265,39 @@ export default {
   max-width: 100%;
   height: auto;
   margin-bottom: 10px;
+}
+.filter-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-dropdown {
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border: 1px solid #baa393;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  z-index: 1000;
+  min-width: 160px;
+}
+
+.filter-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #baa393;
+}
+
+.filter-dropdown button:hover {
+  background-color: #f4f4f4;
+}
+
+.burger-icon {
+  margin-left: 8px;
 }
 </style>
