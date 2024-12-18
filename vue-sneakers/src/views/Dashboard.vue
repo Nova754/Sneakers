@@ -65,7 +65,7 @@ export default {
     },
     async deleteUser(userId) {
     try {
-        await axios.delete(`http://localhost:1000/users/${userId}`);
+        await axios.delete(`http://localhost:3000/users/${userId}`);
         this.fetchUsers(); // Rafraîchit la liste des utilisateurs
         alert('Utilisateur supprimé avec succès.');
     } catch (error) {

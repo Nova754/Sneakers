@@ -1,35 +1,52 @@
 <template>
   <div class="collection">
-    <h1>Votre collection</h1>
- 
-    <!-- Bouton pour envoyer la collection -->
-    <div v-if="collection.length > 0" class="email-export">
-      <button @click="sendCollectionByEmail">Envoyer par e-mail</button>
-    </div>
- 
-    <div v-if="collection.length === 0">
-      <p>Votre collection est vide.</p>
-    </div>
- 
-    <!-- Affichage de la collection -->
-    <div class="sneaker-grid">
-      <div class="sneaker-card" v-for="sneaker in paginatedCollection" :key="sneaker.id">
-        <img :src="sneaker.image" :alt="sneaker.name" />
-        <h2>{{ sneaker.name }}</h2>
-        <p><strong>Marque :</strong> {{ sneaker.brand }}</p>
-        <p><strong>Colorway :</strong> {{ sneaker.colorway }}</p>
-        <p><strong>Valeur Marché :</strong> {{ sneaker.estimatedMarketValue }}€</p>
-        <p><strong>Prix Vente :</strong> {{ sneaker.retailPrice }}€</p>
-        <button @click="removeFromCollection(sneaker.id)">Retirer de la collection</button>
+    <form>
+      <h1>Votre collection</h1>
+  
+      <!-- Bouton pour envoyer la collection -->
+      <div v-if="collection.length > 0" class="email-export">
+        <button @click="sendCollectionByEmail">Envoyer par e-mail</button>
       </div>
-    </div>
- 
-    <!-- Pagination -->
-    <div class="pagination">
-      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Précédent</button>
-      <span>Page {{ currentPage }} sur {{ totalPages }}</span>
-      <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Suivant</button>
-    </div>
+  
+      <div v-if="collection.length === 0">
+        <p>Votre collection est vide.</p>
+      </div>
+  
+      <!-- Affichage de la collection sous forme de tableau -->
+      <table class="sneaker-table" v-if="collection.length > 0">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Nom</th>
+            <th>Marque</th>
+            <th>Couleur</th>
+            <th>Valeur Marché</th>
+            <th>Prix Vente</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="sneaker in paginatedCollection" :key="sneaker.id">
+            <td><img :src="sneaker.image" :alt="sneaker.name" /></td>
+            <td>{{ sneaker.name }}</td>
+            <td>{{ sneaker.brand }}</td>
+            <td>{{ sneaker.colorway }}</td>
+            <td>{{ sneaker.estimatedMarketValue }}€</td>
+            <td>{{ sneaker.retailPrice }}€</td>
+            <td>
+              <button @click="removeFromCollection(sneaker.id)">Retirer</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <!-- Pagination -->
+      <div class="pagination">
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Précédent</button>
+        <span>Page {{ currentPage }} sur {{ totalPages }}</span>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Suivant</button>
+      </div>
+    </form>
   </div>
 </template>
  
@@ -81,11 +98,11 @@ export default {
       }
     },
     async removeFromCollection(sneakerId) {
-      const userId = this.$store.state.user.id;
       try {
+        const userId = this.$store.state.user.id;
         await axios.delete(`http://localhost:3000/collections/${userId}/${sneakerId}`);
-        this.fetchCollection(); // Rafraîchir la collection après suppression
-        alert('Sneaker retirée de la collection avec succès.');
+        this.fetchCollection(); 
+        alert('Sneaker retirée de la colection avec succès.');
       } catch (error) {
         console.error('Erreur lors de la suppression de la sneaker de la collection :', error.message);
         alert('Impossible de retirer la sneaker de la collection.');
@@ -105,23 +122,42 @@ export default {
  
 <style>
 .collection {
-  font-family: Arial, sans-serif;
-  max-width: 90%;
-  margin: 2rem auto;
+  font-family: Avenir, sans-serif;
+  padding: 5%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 900px;
+  margin: auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+h2 {
   text-align: center;
+  color: #3f1107;
+}
+
+.actions {
+  padding: 0.3rem 0.5rem;
+  color: #fff;
+  background-color: #baa393;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-bottom: 5px;
 }
  
 .email-export {
   display: flex;
   justify-content: center;
   margin-bottom: 1.5rem;
-}
- 
-.email-export input {
-  padding: 0.5rem;
-  margin-right: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
 }
  
 .email-export button {
@@ -137,25 +173,27 @@ export default {
   background-color: #0056b3;
 }
  
-.sneaker-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
+.sneaker-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
 }
  
-.sneaker-card {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 1rem;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.sneaker-table th,
+.sneaker-table td {
+  border: 1px solid #d3c6be;
+  text-align: left;
 }
  
-.sneaker-card img {
-  max-width: 100%;
-  height: auto;
-  margin-bottom: 0.5rem;
+.sneaker-table th {
+  background-color: #d3c6be;
+  color: #fff;
+}
+ 
+.sneaker-table img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
 }
  
 .pagination {
@@ -166,7 +204,7 @@ export default {
 }
  
 .pagination button {
-  background-color: #007bff;
+  background-color: #baa393;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -179,4 +217,3 @@ export default {
   cursor: not-allowed;
 }
 </style>
- 

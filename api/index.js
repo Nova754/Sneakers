@@ -3,24 +3,24 @@ const app = express();
 const port = 3000;
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
-const cors = require('cors');
+const cors = require('cors'); 
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv').config();
- 
- 
+
+
 // Utilisation de CORS pour autoriser les requêtes provenant de n'importe quelle origine
 app.use(cors());
 app.use(express.json());
- 
+
 const db = mysql.createPool({
-    host: process.env.DB_HOST,          // 'localhost' ou l'adresse IP de ton serveur
-    port: process.env.DB_PORT,          // 3306
-    user: process.env.DB_USER,          // Utilisateur MySQL (par exemple 'root')
-    password: process.env.DB_PASSWORD,  // Mot de passe de l'utilisateur
-    database: process.env.DB_NAME       // Le nom de la base de données
-  });
+    host: 'localhost',
+    user: 'root',
+    password: 'teo',
+    database: 'sneakersapi',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 // Vérification initiale de la connexion
 db.getConnection((err, connection) => {
     if (err) {
@@ -30,25 +30,7 @@ db.getConnection((err, connection) => {
     console.log('Connecté au pool de connexions MySQL');
     connection.release(); // Libère immédiatement la connexion de test
 });
- 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
- 
-    if (!token) {
-        return res.status(401).json({ message: 'Accès refusé. Aucun token fourni.' });
-    }
- 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Token invalide.' });
-        }
-        req.user = user;
-        next();
-    });
-}
- 
- 
+
 // Routes
  
 // GET /item - Fetch sneakers with pagination
@@ -125,23 +107,24 @@ app.post('/login', (req, res) => {
             console.error('Erreur lors de la récupération de l\'utilisateur:', err.message);
             return res.status(500).send('Erreur interne du serveur.');
         }
+ 
         if (results.length === 0) {
             return res.status(404).send('Utilisateur introuvable.');
         }
  
         const user = results[0];
         const passwordMatch = await bcrypt.compare(password, user.password);
+ 
         if (!passwordMatch) {
             return res.status(401).send('Mot de passe incorrect.');
         }
-        const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+ 
         res.status(200).json({
             id: user.id,
             name: user.name,
             lastName: user.lastName,
             email: user.email,
             role: user.role,
-            token,
         });
     });
 });
@@ -175,7 +158,7 @@ app.get('/users/:id', (req, res) => {
 });
  
 // PUT /users/:id - Update user role
-app.put('/users/:id', authenticateToken, (req, res) => {
+app.put('/users/:id', (req, res) => {
     const userId = req.params.id;
     const { role } = req.body;
  
@@ -204,7 +187,7 @@ app.put('/users/:id', authenticateToken, (req, res) => {
 });
  
 // DELETE /users/:id - Delete a user
-app.delete('/users/:id', authenticateToken, (req, res) => {
+app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
  
     // Étape 1 : Supprimer les dépendances
@@ -246,7 +229,7 @@ app.delete('/users/:id', authenticateToken, (req, res) => {
         });
  
 // POST /collections - Add sneaker to user collection
-app.post('/collections', authenticateToken, (req, res) => {
+app.post('/collections', (req, res) => {
     const { userId, sneakerId } = req.body;
  
     if (!userId || !sneakerId) {
@@ -264,7 +247,7 @@ app.post('/collections', authenticateToken, (req, res) => {
 });
  
 // POST /wishlists - Add sneaker to user wishlist
-app.post('/wishlists', authenticateToken, (req, res) => {
+app.post('/wishlists', (req, res) => {
     const { userId, sneakerId } = req.body;
  
     if (!userId || !sneakerId) {
@@ -272,7 +255,7 @@ app.post('/wishlists', authenticateToken, (req, res) => {
     }
  
     const sql = 'INSERT INTO wishlists (user_id, sneaker_id) VALUES (?, ?)';
- 
+
     db.query(sql, [userId, sneakerId], (err, results) => {
         if (err) {
             console.error('Erreur lors de l\'ajout à la wishlist :', err.message);
@@ -330,7 +313,7 @@ app.get('/collections/:userId', (req, res) => {
     });
 });
  
-app.delete('/wishlists/:userId/:sneakerId', authenticateToken, (req, res) => {
+app.delete('/wishlists/:userId/:sneakerId', (req, res) => {
     const { userId, sneakerId } = req.params;
  
     if (!userId || !sneakerId) {
@@ -354,7 +337,7 @@ app.delete('/wishlists/:userId/:sneakerId', authenticateToken, (req, res) => {
 });
  
 // POST /send-collection-email - Envoyer la collection par e-mail
-app.post('/send-collection-email', authenticateToken, (req, res) => {
+app.post('/send-collection-email', (req, res) => {
     const { userId, userEmail } = req.body;
  
     if (!userId || !userEmail) {
@@ -398,14 +381,14 @@ app.post('/send-collection-email', authenticateToken, (req, res) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail', // Ou utilisez un autre service de messagerie
             auth: {
-                user: 'bcrzs.pro@gmail.com', // Remplacez par votre e-mail
-                pass: 'emdq pmdx btpa ehia', // Mot de passe ou App Password
+                user: 'lea.berhamel1@gmail.com', // Remplacez par votre e-mail
+                pass: 'kjmx tcor gedz rmnn', // Mot de passe ou App Password
             },
         });
  
         // Options de l'e-mail
         const mailOptions = {
-            from: '"SneakR" <bcrzs.pro@gmail.com>',
+            from: '"SneakR" <lea.berhamel1@gmail.com>',
             to: userEmail,
             subject: 'Votre Collection SneakR',
             html: emailContent,
