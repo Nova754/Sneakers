@@ -1,18 +1,36 @@
 <template>
+  <div id="app">
   <nav>
-    <NavBar /><router-view />
+    <NavBar :user="user" @logout="logout" />
+    <router-view />
   </nav>
+  </div>
 </template>
+ 
 <script>
-import NavBar from './components/NavBar.vue'
+import { mapState, mapMutations } from 'vuex';
+import NavBar from './components/NavBar.vue';
+ 
 export default {
-  components: {
-    NavBar
-  }
-}
+  name: 'App',
+  components: { NavBar },
+  computed: {
+    ...mapState(['user']),
+  },
+  methods: {
+    ...mapMutations(['setUser']),
+    logout() {
+      this.setUser(null); // Déconnecte l'utilisateur
+      this.$router.push('/login'); // Redirige vers la page de login
+    },
+  },
+};
 </script>
+ 
 <style>
-#app {
+
+body {
+  margin:0;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
