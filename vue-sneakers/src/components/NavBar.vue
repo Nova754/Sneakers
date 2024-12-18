@@ -176,7 +176,7 @@ export default {
 }
 
 .user-menu button {
-  background-color: #3f1107;
+  background-color: #3f1107 !important;
   color: white;
   border: none;
   padding: 8px;
@@ -186,6 +186,6 @@ export default {
 }
 
 .user-menu button:hover {
-  background-color: #5f2e1f;
+  background-color: #5f2e1f !important;
 }
 </style>

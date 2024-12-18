@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <form>
     <h1>Admin Dashboard</h1>
     <p>Welcome to the admin dashboard. Here you can manage users.</p>
  
@@ -30,6 +31,7 @@
         </tr>
       </tbody>
     </table>
+  </form>
   </div>
 </template>
  
@@ -80,20 +82,31 @@ export default {
 };
 </script>
  
+
 <style>
-.dashboard {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem;
-  font-family: Arial, sans-serif;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 900px;
+  margin: auto;
+  padding: 30px;
   background-color: #fff;
-  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-.dashboard h1 {
-  margin-bottom: 1rem;
-  color: #333;
+
+.dashboard {
+  font-family: Avenir, sans-serif;
+  padding: 5%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.dashboard h1, p{
+  text-align: center;
+  color: #3f1107;
 }
 table {
   width: 100%;
@@ -101,23 +114,25 @@ table {
   margin-top: 1rem;
 }
 th, td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
+  border: 1px solid #d3c6be;
   text-align: left;
+  padding: 0.5rem;
 }
 th {
-  background-color: #f4f4f4;
+  background-color: #d3c6be;
+  color: #fff;
 }
 button {
   padding: 0.3rem 0.5rem;
   color: #fff;
-  background-color: #d9534f;
+  background-color: #baa393;
   border: none;
   border-radius: 3px;
   cursor: pointer;
+  margin-bottom: 5px;
 }
 button:hover {
-  background-color: #c9302c;
+  background-color: #d3c6be;
 }
 select {
   padding: 0.3rem;

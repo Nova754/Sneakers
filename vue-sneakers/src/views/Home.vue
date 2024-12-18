@@ -25,7 +25,7 @@
         :min="minPrice"
         placeholder="Prix maximum"
       />
-      <button @click="applyFilters">Appliquer les filtres</button>
+      <button class="apply" @click="applyFilters">Appliquer les filtres</button>
     </div>
 
     <!-- Erreur lors de la récupération des sneakers -->
@@ -300,7 +300,7 @@ export default {
   position: absolute;
   top: 60px;
   right: 0;
-  width: 300px;
+  width: 400px;
   background-color: #baa393;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   padding: 1rem;
@@ -314,14 +314,14 @@ export default {
 }
 
 .filters input {
-  width: 100%;
+  width: 95%;
   padding: 0.5rem;
   border: 1px solid #ccc;
   margin-bottom: 0.5rem;
 }
 
 .filters button {
-  background-color: #c5b8ae;
+  background-color: #3f1107 !important;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -330,7 +330,7 @@ export default {
 }
 
 .filters button:hover {
-  background-color: #ac9687;
+  background-color: #5f2a1d !important;
 }
 
 .error-message {
@@ -525,4 +525,5 @@ export default {
   width: 2rem; /* Ajustez la taille de l'image selon vos besoins */
   height: auto;
 }
+
 </style>

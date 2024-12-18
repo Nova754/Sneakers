@@ -1,6 +1,10 @@
-# RESTAPI
+# SNEAKERS
 
-## Documentation de l’API Restaurant
+## Documentation de l’API Rest
+
+### Introduction
+SneakR est une API permettant d'afficher les items et de gérer les utilisateurs, les collections et les wishlists de sneakers. Elle offre des fonctionnalités telles que l'enregistrement des utilisateurs ainsi que l'envoi de la collection par e-mail.
+
 
 ### Installation
 
@@ -12,16 +16,25 @@
 
 #### Étape 1 : Installer les dépendances Node.js
 
+On utilise :
+- express : Framework web pour Node.js.
+- mysql2 : Connecteur MySQL pour Node.js.
+- bcrypt : Bibliothèque pour le hachage de mots de passe.
+- cors : Middleware pour autoriser les requêtes CORS.
+- pdfkit : Librairie pour générer des PDF.
+- nodemailer : Module pour envoyer des e-mails via Node.js.
+
 ```
 npm init -y
  
-npm install express
- 
+npm install express 
 npm install mysql2
+npm install bcrypt 
+npm install cors
+npm install pdfkit
+npm install nodemailer
 ```
-On utilise 
-- express pour simplifier la gestion des requêtes HTTP, des routes et des middleware (fonction dans une application web qui se situe entre la requête d’un client et la réponse du serveur)
-- mysql2, une bibliothèque pour intéragir avec des bases de données MySQL
+
 
 #### Étape 2 : Configuration de MySQL et phpMyAdmin avec Docker
 
@@ -29,6 +42,7 @@ On utilise
 2. On lance Docker pour configurer MySQL et phpMyAdmin :
 
 ```
+cd api
 docker-compose up -d
 ```
 
@@ -36,144 +50,196 @@ docker-compose up -d
 - ***Nom d'utilisateur*** : `root`
 - ***Mot de passe*** : `teo`
 
-La base de données `restaurantapi` sera déjà créée et on pourra y gérer les tables et données via phpMyAdmin.
+4. On crée la base de données sneakersapi et ajoute les différentes tables avec les colonnes en copiant le code suivant dans l'onglet **SQL**
+
+
+``` sql
+CREATE DATABASE sneakersapi;
+
+USE sneakersapi;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    lastName VARCHAR(255),
+    name VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    password VARCHAR(255),
+    role VARCHAR(50)
+);
+
+CREATE TABLE item (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    brand VARCHAR(255),
+    colorway VARCHAR(255),
+    retailPrice DECIMAL(10, 2),
+    estimatedMarketValue DECIMAL(10, 2),
+    image VARCHAR(255)
+);
+
+CREATE TABLE collections (
+    user_id INT,
+    sneaker_id INT,
+    PRIMARY KEY (user_id, sneaker_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (sneaker_id) REFERENCES item(id)
+);
+
+CREATE TABLE wishlists (
+    user_id INT,
+    sneaker_id INT,
+    PRIMARY KEY (user_id, sneaker_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (sneaker_id) REFERENCES item(id)
+);
+```
+5. On importe les données à la base de données en copiant le code suivant dans le **terminal**
+
+```
+cd api
+node import.js
+```
+6. On enleve les items n'ayant pas d'image avec le code suivant dans le **SQL de la table item**
+```
+DELETE FROM item
+WHERE image = '[]';
+```
 
 #### Étape 3 : Démarrer le Serveur API
 
 Une fois la base de données opérationnelle, on démarre le serveur API avec :
 
 ```
+cd api
 node index.js
 ```
 
 L'API sera disponible à l'adresse [http://localhost:3000](http://localhost:3000).
 
-### Authentification
-
-L'API utilise une authentification basique pour limiter l'accès à certaines routes aux administrateurs. On configure deux types d'utilisateurs : 
-
-- ***Administrateur*** :
-  - Nom d'utilisateur : `admin`
-  - Mot de passe : `adminpassword`
-  - Rôle : `admin`
-  
-- ***Utilisateur*** :
-  - Nom d'utilisateur : `client`
-  - Mot de passe : `clientpassword`
-  - Rôle : `client`
 
 ### Endpoints de l'API (URL spécifiques sur un serveur web qui permettent aux utilisateurs d'accéder à des bases de données ou des services via à l'API)
 
-On utilise des méthodes HTTP : GET, POST, PUT, DELETE, PATCH, OPTIONS.
+On utilise des méthodes HTTP : GET, POST, PUT, DELETE
 
-#### Items
+#### 1. `/item` - Récupérer les sneakers avec pagination
+- **Méthode** : `GET`
+- **Paramètres** :
+  - `page` : Page de la pagination (par défaut : 1)
+  - `limit` : Nombre d'articles par page (par défaut : 8)
+- **But** : Récupérer la liste paginée des sneakers disponibles.
 
-***GET***
-- `GET /items` : Récupération de tous les items.
-- `GET /items/:id` : Récupération d'un item par son ID.
+---
 
+#### 2. `/register` - Inscription d'un nouvel utilisateur
+- **Méthode** : `POST`
+- **Paramètres** : 
+  - `lastName` : Nom de famille
+  - `name` : Prénom
+  - `email` : Adresse e-mail
+  - `password` : Mot de passe
+- **But** : Créer un nouvel utilisateur dans le système.
 
-***POST***
-- `POST /items` : Ajout d'un nouvel item (réservé aux administrateurs).
+---
 
+#### 3. `/login` - Connexion de l'utilisateur
+- **Méthode** : `POST`
+- **Paramètres** :
+  - `email` : Adresse e-mail
+  - `password` : Mot de passe
+- **But** : Authentifier l'utilisateur et lui fournir ses informations (ID, nom, rôle, etc.).
 
-***PUT***
-- `PUT /items/:id` : Mise à jour d'un item par son ID, remplacement de l'ensemble de la ressource (réservé aux administrateurs).
+---
 
+#### 4. `/users` - Récupérer tous les utilisateurs
+- **Méthode** : `GET`
+- **But** : Récupérer la liste de tous les utilisateurs dans le système.
 
-***DELETE***
-- `DELETE /items/:id` : Supression d'un item par son ID (réservée aux administrateurs).
+---
 
-***PATCH***
-- `PATCH /items/:id` : Mise à jour d'un item par son ID, application des modifications partielles à la ressource (réservée aux administrateurs)
+#### 5. `/users/:id` - Récupérer les détails d'un utilisateur
+- **Méthode** : `GET`
+- **Paramètres** :
+  - `id` : ID de l'utilisateur
+- **But** : Récupérer les informations détaillées d'un utilisateur spécifique.
 
-#### Catégories
+---
 
-***GET***
-- `GET /categories` : Récupération de toutes les catégories.
-- `GET /categories/:id` : Récupération d'une catégorie par son ID.
+#### 6. `/users/:id` - Mise à jour du rôle de l'utilisateur
+- **Méthode** : `PUT`
+- **Paramètres** :
+  - `role` : Nouveau rôle de l'utilisateur (ex. 'USER', 'ADMIN')
+- **But** : Modifier le rôle d'un utilisateur dans le système.
 
-***POST***
-- `POST /categories` : Ajout d'une nouvelle catégorie (réservé aux administrateurs).
+---
 
-***PUT***
-- `PUT /categories/:id` : Mise à jour d'une catégorie par son ID, remplacement de la ressource entière (réservé aux administrateurs).
+#### 7. `/users/:id` - Suppression d'un utilisateur
+- **Méthode** : `DELETE`
+- **Paramètres** :
+  - `id` : ID de l'utilisateur
+- **But** : Supprimer un utilisateur spécifique du système.
 
-***DELETE***
-- `DELETE /categories/:id` : Suppression d'une catégorie par son ID (réservé aux administrateurs).
+---
 
-***PATCH***
-- `PATCH /categories/:id` : Mise à jour d'une catégorie par son ID, application des modifications partielles à la ressource (réservée aux administrateurs).
+#### 8. `/collections` - Ajouter un sneaker à la collection de l'utilisateur
+- **Méthode** : `POST`
+- **Paramètres** :
+  - `userId` : ID de l'utilisateur
+  - `sneakerId` : ID du sneaker
+- **But** : Ajouter un sneaker à la collection de l'utilisateur.
 
-#### Formules
+---
 
-***GET***
-- `GET /formulas` : Récupération de toutes les formules (filtrage par nom, prix, et catégorie disponible).
-- `GET /formulas/:id` : Récupération d'une formule par son ID.
+#### 9. `/wishlists` - Ajouter un sneaker à la wishlist de l'utilisateur
+- **Méthode** : `POST`
+- **Paramètres** :
+  - `userId` : ID de l'utilisateur
+  - `sneakerId` : ID du sneaker
+- **But** : Ajouter un sneaker à la wishlist de l'utilisateur.
 
-***POST***
-- `POST /formulas` : Ajout d'une nouvelle formule (réservé aux administrateurs).
+---
 
-***PUT***
-- `PUT /formulas/:id` : Mise à jour d'une formule par son ID, remplacement de la ressource entière (réservé aux administrateurs).
+#### 10. `/wishlists/:userId` - Récupérer la wishlist d'un utilisateur
+- **Méthode** : `GET`
+- **Paramètres** :
+  - `userId` : ID de l'utilisateur
+- **But** : Récupérer la liste des sneakers présents dans la wishlist de l'utilisateur.
 
-***DELETE***
-- `DELETE /formulas/:id` : Suppression d'une formule par son ID (réservée aux administrateurs).
+---
 
-***PATCH***
-- `PATCH /formulas/:id` : Mise à jour d'une formule par son ID, application des modifications partielles à la ressource (réservée aux administrateurs).
+#### 11. `/collections/:userId` - Récupérer la collection d'un utilisateur
+- **Méthode** : `GET`
+- **Paramètres** :
+  - `userId` : ID de l'utilisateur
+- **But** : Récupérer la liste des sneakers dans la collection de l'utilisateur.
 
-#### Filtre 
+---
 
-***GET***
-- `GET /item?parameters=` : Filtrer les items en fonction du paramètre (nom, description, prix et catégorie).
-- `GET /formulas?parameters=` : Filtrer les formules en fonction du paramètre (nom, prix et catégorie)
+#### 12. `/collections/:userId/:sneakerId` - Supprimer un sneaker de la collection de l'utilisateur
+- **Méthode** : `DELETE`
+- **Paramètres** :
+  - `userId` : ID de l'utilisateur
+  - `sneakerId` : ID du sneaker
+- **But** : Supprimer un sneaker de la collection de l'utilisateur.
 
-#### Affichage des méthodes autorisées en fonction du type d'utilisateur
+---
 
-***OPTIONS***
-- cela s'affiche dès que l'URL `http://localhost:3000` est écrit.
+#### 13. `/wishlists/:userId/:sneakerId` - Supprimer un sneaker de la wishlist de l'utilisateur
+- **Méthode** : `DELETE`
+- **Paramètres** :
+  - `userId` : ID de l'utilisateur
+  - `sneakerId` : ID du sneaker
+- **But** : Supprimer un sneaker de la wishlist de l'utilisateur.
 
-### Tester l'API avec Postman
+---
 
-Pour vérifier que les requêtes de l'API fonctionne, on utilise Postman :
+#### 14. `/send-collection-email` - Envoyer la collection par e-mail
+- **Méthode** : `POST`
+- **Paramètres** :
+  - `userId` : ID de l'utilisateur
+  - `userEmail` : E-mail de l'utilisateur
+- **But** : Envoyer la collection de sneakers de l'utilisateur à son adresse e-mail.
 
-1. On ajoute au début de l'URL `http://localhost:3000` dans les requêtes.
-
-2. Pour choisir le type d'utilisateur qu'on souhaite être :
-  - on va sur l'onglet **Authorization**.
-  - puis sur **Basic Auth**.
-  - on écrit l'identifiant et le mot de passe de l'utilisateur qu'on veut tester
-
-3. Si on souhaite mettre à jour des données avec les commandes PUT et PATCH :
-  - on va sur l'onglet **Body**
-  - puis sur **raw**
-  - on choisit **JSON**
-  - on écrit les modifications qu'on souhaite effectuer.
-
-  ***Exemple***
-  ```json
-  {
-    "id": 2,
-    "name": "Pizza Margherita",
-    "description": "Pizza traditionnelle avec sauce tomate et fromage",
-    "price": 10.99,
-    "category_id": 1
-  }
-  ```
-
-4. Si on souhaite afficher les méthodes autorisées en fonction de l'utilisateur :
-  - on va sur l'onglet **Headers**
-  
-  ***Exemple***
-
-  |                              |              |
-  |------------------------------|--------------|
-  | Allow                        | GET, OPTIONS |
-  | Access-Control-Allow-Methods | GET, OPTIONS |
-  | Access-Control-Allow-Origin  |      *       |
-
-5. Signification des codes de statut HTTP qui s'affichent à chaque requête
+#### Signification des codes de statut HTTP qui s'affichent à chaque requête
     - **200 OK**
       - La requête a réussi. Le serveur a renvoyé la réponse demandée. 
 

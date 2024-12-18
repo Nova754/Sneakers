@@ -32,7 +32,6 @@ const routes = [
         next();
       } else {
         alert('Veuillez vous connecter pour accéder à votre liste de souhaits.');
-        next('/login');
       }
     },
   }, 
@@ -45,7 +44,6 @@ const routes = [
         next();
       } else {
         alert('Veuillez vous connecter pour accéder à votre collection.');
-        next('/login');
       }
     },
   },

@@ -1,7 +1,7 @@
 <template>
   <div class="wishlist">
     <form>
-    <h2>Mon Wishlist</h2>
+    <h2>Votre Wishlist</h2>
  
     <!-- Tableau des sneakers -->
     <div v-if="filteredWishlist.length === 0">
@@ -176,6 +176,8 @@ table th {
   border: none;
   border-radius: 3px;
   cursor: pointer;
-  margin-bottom: 5px;
+}
+.actions + .actions {
+  margin-left: 10px;
 }
 </style>

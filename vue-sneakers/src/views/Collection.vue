@@ -59,7 +59,7 @@ export default {
     return {
       collection: [],
       currentPage: 1,
-      itemsPerPage: 20,
+      itemsPerPage: 10,
     };
   },
   computed: {

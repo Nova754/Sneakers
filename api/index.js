@@ -312,7 +312,30 @@ app.get('/collections/:userId', (req, res) => {
         res.status(200).json(results);
     });
 });
+
+app.delete('/collections/:userId/:sneakerId', (req, res) => {
+    const { userId, sneakerId } = req.params;
  
+    if (!userId || !sneakerId) {
+        return res.status(400).send('Utilisateur et sneaker requis.');
+    }
+ 
+    const sql = 'DELETE FROM collections WHERE user_id = ? AND sneaker_id = ?';
+ 
+    db.query(sql, [userId, sneakerId], (err, results) => {
+        if (err) {
+            console.error('Erreur lors de la suppression de la sneaker de la collection :', err.message);
+            return res.status(500).send('Erreur lors de la suppression de la sneaker de la collection.');
+        }
+ 
+        if (results.affectedRows === 0) {
+            return res.status(404).send('Sneaker non trouvée dans la collection.');
+        }
+ 
+        res.status(200).send('Sneaker supprimée de la collection.');
+    });
+})
+
 app.delete('/wishlists/:userId/:sneakerId', (req, res) => {
     const { userId, sneakerId } = req.params;
  
