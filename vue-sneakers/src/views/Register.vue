@@ -1,8 +1,8 @@
 <template>
     <div class="register">
       <div class="form">
-        <h1>Register</h1>
         <form @submit.prevent="registerUser">
+          <h1>Register</h1>
           <div class="form-group">
             <label for="lastName">Last Name</label>
             <input id="lastName" v-model="form.lastName" type="text" required />
@@ -68,21 +68,15 @@
     color: #3f1107;
   }
   .form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 60%;
-    margin: auto;
-    padding: 30px;
+    display: fetch;
+    margin-bottom: 1rem;
+    width: 73%;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
-  form {
-    display: block;
-    margin-bottom: 1rem;
-    width: 100%;
-  }
+
+
   label {
     display: block;
     margin-bottom: 0.5rem;

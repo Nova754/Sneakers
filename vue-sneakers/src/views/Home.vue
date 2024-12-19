@@ -182,7 +182,7 @@ export default {
       this.selectedSneaker = null;
     },
     async addToCollection(sneakerId) {
-      if (this.wishlists.includes(sneakerId)) {
+      if (this.wishlist.includes(sneakerId)) {
         alert('Cette sneaker est déjà dans votre wishlist. Veuillez la retirer avant de l\'ajouter à votre collection.');
         return;
       }
